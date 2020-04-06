@@ -2,7 +2,7 @@ import numpy as np
 
 # Given an array of faces (N x M x M, where N is number of examples and M is number of pixes along each axis),
 # return a design matrix Xtilde ((M**2 + 1) x N) whose last row contains all 1s.
-def reshapeAndAppend1s (faces):
+def reshapeAndAppend1s(faces):
     faces = faces[:, :, ::-1]
     faces = faces.T
     faces = np.reshape(faces, (faces.shape[0] ** 2, faces.shape[2]))
@@ -19,23 +19,15 @@ def fMSE (w, Xtilde, y):
 # Given a vector of weights w, a design matrix Xtilde, and a vector of labels y, and a regularization strength
 # alpha (default value of 0), return the gradient of the (regularized) MSE loss.
 def gradfMSE (w, Xtilde, y, alpha = 0.):
-    # regularization = (w.T.dot(w)).mean * (alpha/2)
-    # gradfmse = fMSE(w, Xtilde, y) + regularization
-    # return gradfmse
-
-    wtilde = np.linalg.solve(Xtilde.dot(Xtilde.T), Xtilde.dot(y))
-    return wtilde
+    return (Xtilde * (Xtilde.T.dot(w) - y)).mean()
 
 # Given a design matrix Xtilde and labels y, train a linear regressor for Xtilde and y using the analytical solution.
 def method1 (Xtilde, y):
-    w = gradfMSE(None, Xtilde, y)
-    mse = fMSE(w, Xtilde, y)
-    print(mse)
-    return mse
+    return np.linalg.solve(Xtilde.dot(Xtilde.T), Xtilde.dot(y))
 
 # Given a design matrix Xtilde and labels y, train a linear regressor for Xtilde and y using gradient descent on fMSE.
 def method2 (Xtilde, y):
-    pass
+    gradientDescent(Xtilde, y)
 
 # Given a design matrix Xtilde and labels y, train a linear regressor for Xtilde and y using gradient descent on fMSE
 # with regularization.
@@ -48,6 +40,12 @@ def gradientDescent (Xtilde, y, alpha = 0.):
     EPSILON = 3e-3  # Step size aka learning rate
     T = 5000  # Number of gradient descent iterations
 
+    w = 0.01 * np.random.randn(Xtilde.shape[0])
+    for i in range(T):
+        w = w - (EPSILON * gradfMSE(w, Xtilde, y))
+
+    return w
+
 if __name__ == "__main__":
     # Load data
     Xtilde_tr = reshapeAndAppend1s(np.load("age_regression_Xtr.npy"))
@@ -56,7 +54,15 @@ if __name__ == "__main__":
     yte = np.load("age_regression_yte.npy")
 
     w1 = method1(Xtilde_tr, ytr)
+    mse_tr = fMSE(w1, Xtilde_tr, ytr)
+    mse_te = fMSE(w1, Xtilde_te, yte)
+    print(mse_tr, mse_te)
+
     w2 = method2(Xtilde_tr, ytr)
+    mse_tr = fMSE(w2, Xtilde_tr, ytr)
+    mse_te = fMSE(w2, Xtilde_te, yte)
+    print(mse_tr, mse_te)
+
     w3 = method3(Xtilde_tr, ytr)
 
     # Report fMSE cost using each of the three learned weight vectors
