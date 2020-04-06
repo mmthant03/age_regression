@@ -13,14 +13,16 @@ def reshapeAndAppend1s (faces):
 # MSE.
 def fMSE (w, Xtilde, y):
     yhat = Xtilde.T.dot(w) 
-    n = Xtilde.shape[1]
     fmse = ((yhat-y)**2).mean / 2
     return fmse
 
 # Given a vector of weights w, a design matrix Xtilde, and a vector of labels y, and a regularization strength
 # alpha (default value of 0), return the gradient of the (regularized) MSE loss.
 def gradfMSE (w, Xtilde, y, alpha = 0.):
-    pass
+    regularization = (w.T.dot(w)).mean * (alpha/2)
+    gradfmse = fMSE(w, Xtilde, y) + regularization
+    return gradfmse
+    
 
 # Given a design matrix Xtilde and labels y, train a linear regressor for Xtilde and y using the analytical solution.
 def method1 (Xtilde, y):
