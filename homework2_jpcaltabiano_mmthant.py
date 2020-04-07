@@ -3,7 +3,7 @@ import numpy as np
 # Given an array of faces (N x M x M, where N is number of examples and M is number of pixes along each axis),
 # return a design matrix Xtilde ((M**2 + 1) x N) whose last row contains all 1s.
 def reshapeAndAppend1s (faces):
-    faces = faces[:, :, ::-1]
+    faces = faces[ :, :, ::-1]
     faces = faces.T
     faces = np.reshape(faces, (faces.shape[0] ** 2, faces.shape[2]))
     faces = np.vstack((faces, np.ones(faces.shape[1])))
@@ -60,4 +60,4 @@ if __name__ == "__main__":
     w3 = method3(Xtilde_tr, ytr)
 
     # Report fMSE cost using each of the three learned weight vectors
-    # ...
+    # ...b 
