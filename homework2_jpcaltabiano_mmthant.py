@@ -82,7 +82,12 @@ if __name__ == "__main__":
     # report rmse for part c
     yhat = Xtilde_te.T.dot(w3)
     rmse = (((yhat-yte)**2).mean()) ** 0.5
-    
+
+    errors = abs(yte - yhat)
+    errors_idx = np.argsort(errors)
+    errors_idx = errors_idx[::-1]
+    errors_idx = errors_idx[0:5]
+
 
     if DEBUG:
         # print("Weight Vector for method 1:\t", w1)
@@ -100,6 +105,11 @@ if __name__ == "__main__":
         plt.imshow(t)
         plt.show()
 
-    
+    for i in errors_idx:
+        print(i)
+        image = Xtilde_te[:-1, i].reshape((48,48))
+        plt.imshow(image)
+        plt.show()
+        
 
 
